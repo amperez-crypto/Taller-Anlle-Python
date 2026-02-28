@@ -1,21 +1,15 @@
 #Cargar datos
 import pandas as pd
-import codecs
+
+RUTA_ARCHIVO="data/personas,csv"
 
 datos = pd.read_csv('data/personas.csv')
-#----------------------------------------
-#--------Fin cargar datos----------------
 
-texto_original = "Juan"
+def decifrar_palabra(palabra_cifrada):
+    import codecs
+    nueva_palabra = codecs.encode(palabra_cifrada,"rot13")
+    return nueva_palabra
 
-#Cifrar ROT13
-texto_cifrado = codecs.encode(texto_original,'rot_13')
-print(f"Cifrado_ {texto_cifrado}")
-
-# MARIA = ZNEVN
-
-condicion = datos['nombre_cifrado'] == 'Whna'
-
-datos_nuevos =datos[condicion]
-
-print(datos_nuevos)
+datos["nombre"] = datos ["nombre_cifrado"].apply(decifrar_palabra)
+condicion = datos["nombre"] =="Juan"
+print("Juan aparece:",datos[condicion].shape[0])
