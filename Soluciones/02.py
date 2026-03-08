@@ -1,21 +1,10 @@
-#Cargar datos
+import sqlite3
 import pandas as pd
-import codecs
 
-datos = pd.read_csv('data/personas.csv')
-#----------------------------------------
-#--------Fin cargar datos----------------
+conn = sqlite3.connect("data/personas_limpias.db")
+datos = pd.read_sql("SELECT * FROM personas", conn)
+conn.close()
 
-texto_original = "Hola Mundo, Python 3"
-
-#Cifrar ROT13
-texto_cifrado = codecs.encode(texto_original,'rot_13')
-print(f"Cifrado_ {texto_cifrado}")
-
-# MARIA = ZNEVN
-
-condicion = datos['nombre_cifrado'] == 'Znevn'
-
-datos_nuevos =datos[condicion]
-
-print(datos_nuevos.shape[0])
+condicion = datos['nombre'] == 'Maria'
+print(f"Maria aparece: {datos[condicion].shape[0]}")
+# Respuesta esperada: 4160

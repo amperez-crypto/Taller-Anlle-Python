@@ -1,0 +1,119 @@
+import pandas as pd
+import codecs
+import re
+import sqlite3
+
+# =============================================
+# CARGAR DATOS
+# =============================================
+datos = pd.read_csv("data/personas.csv")
+
+# =============================================
+# COLUMNA: nombre_cifrado → nombre
+# =============================================
+datos['nombre_cifrado_limpio'] = (
+    datos['nombre_cifrado']
+    .astype(str)
+    .str.strip()
+    .str.replace(r'[^a-zA-Z]', '', regex=True)
+)
+datos['nombre'] = datos['nombre_cifrado_limpio'].apply(
+    lambda x: codecs.decode(x, 'rot_13')
+)
+
+# =============================================
+# COLUMNA: apellido_cifrado → apellido
+# =============================================
+datos['apellido_cifrado_limpio'] = (
+    datos['apellido_cifrado']
+    .astype(str)
+    .str.strip()
+    .str.replace(r'[^a-zA-Z]', '', regex=True)
+)
+datos['apellido'] = datos['apellido_cifrado_limpio'].apply(
+    lambda x: codecs.decode(x, 'rot_13')
+)
+
+# =============================================
+# COLUMNA: ciudad
+# =============================================
+datos['ciudad'] = (
+    datos['ciudad']
+    .astype(str)
+    .str.strip()
+    .str.replace("á","a").str.replace("é","e")
+    .str.replace("í","i").str.replace("ó","o").str.replace("ú","u")
+    .str.upper()
+    .str.replace(r'[^A-Z ]', '', regex=True)
+    .str.strip()
+)
+
+# =============================================
+# COLUMNA: profesion
+# =============================================
+datos['profesion'] = (
+    datos['profesion']
+    .astype(str)
+    .str.strip()
+    .str.replace("á","a").str.replace("é","e")
+    .str.replace("í","i").str.replace("ó","o").str.replace("ú","u")
+    .str.upper()
+    .str.replace(r'[^A-Z ]', '', regex=True)
+    .str.strip()
+)
+
+# =============================================
+# COLUMNA: email
+# =============================================
+datos['email'] = datos['email'].astype(str).str.strip()
+
+# =============================================
+# COLUMNA: salario
+# =============================================
+def limpiar_salario(valor):
+    valor = str(valor).strip()
+    valor = re.sub(r'[^0-9.]', '', valor)
+    try:
+        resultado = float(valor)
+        if resultado < 1000:
+            return None
+        return resultado
+    except:
+        return None
+
+datos['salario_limpio'] = datos['salario'].apply(limpiar_salario)
+
+# =============================================
+# COLUMNA: fecha_nacimiento
+# =============================================
+datos['fecha_nacimiento'] = pd.to_datetime(
+    datos['fecha_nacimiento'], 
+    errors='coerce',
+    dayfirst=False
+)
+
+# =============================================
+# COLUMNA: activo
+# =============================================
+def limpiar_activo(valor):
+    valor = str(valor).strip().lower()
+    if valor in ['true', '1', 'yes', 'si', 'sí', 'verdadero']:
+        return True
+    elif valor in ['false', '0', 'no', 'falso']:
+        return False
+    return None
+
+datos['activo_limpio'] = datos['activo'].apply(limpiar_activo)
+
+# =============================================
+# EXPORTAR A SQLITE CON DATOS LIMPIOS
+# =============================================
+conn = sqlite3.connect("data/personas_limpias.db")
+datos.to_sql("personas", conn, if_exists="replace", index=False)
+conn.close()
+
+print("✅ Base de datos limpia creada: data/personas_limpias.db")
+print("✅ Filas totales:", len(datos))
+print("✅ Ciudades únicas:", datos['ciudad'].nunique())
+print("✅ Profesiones únicas:", datos['profesion'].nunique())
+print("✅ Salario promedio:", datos['salario_limpio'].mean())

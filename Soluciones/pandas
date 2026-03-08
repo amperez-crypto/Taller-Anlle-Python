@@ -1,0 +1,11 @@
+import pandas as pd
+import sqlite3
+
+datos = pd.read_csv("data/personas.csv")
+
+# Crear base de datos SQLite
+conn = sqlite3.connect("data/personas.db")
+datos.to_sql("personas", conn, if_exists="replace", index=False)
+conn.close()
+
+print("✅ Base de datos creada: data/personas.db")
