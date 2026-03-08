@@ -66,4 +66,29 @@ def limpiar_salario(valor):
     except:
         return None
 
+# Agregar esto en limpieza.py después de limpiar profesion
+mapeo_profesiones = {
+    'CONTDOR': 'CONTADOR',
+    'ELCTRICIST': 'ELECTRICISTA',
+    'PRIODIST': 'PERIODISTA',
+    'ECONOMIST': 'ECONOMISTA',
+    'PROGRMDOR': 'PROGRAMADOR',
+    'PLOMRO': 'PLOMERO',
+    'ENFRMRO': 'ENFERMERO',
+    'INGNIRO': 'INGENIERO',
+    'TRDUCTOR': 'TRADUCTOR',
+    'DISNDOR': 'DISENADOR',
+    'VTRINRIO': 'VETERINARIO',
+    'MDICO': 'MEDICO',
+    'ABOGDO': 'ABOGADO',
+    'ADMINISTRDOR': 'ADMINISTRADOR',
+    'ARQUITCTO': 'ARQUITECTO',
+    'CRPINTRO': 'CARPINTERO',
+    'PROFSOR': 'PROFESOR',
+    'MCNICO': 'MECANICO',
+    'CHF': 'CHEF'
+}
+
+datos['profesion'] = datos['profesion'].replace(mapeo_profesiones)
+
 # ===========
